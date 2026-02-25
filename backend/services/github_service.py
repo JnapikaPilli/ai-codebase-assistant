@@ -6,28 +6,41 @@ def get_repo_files(repo_url):
     Fetch files from a GitHub repository
     """
 
-    # convert repo URL to GitHub API URL
     parts = repo_url.replace("https://github.com/", "").split("/")
     owner = parts[0]
     repo = parts[1]
 
     api_url = f"https://api.github.com/repos/{owner}/{repo}/contents"
 
-    response = requests.get(api_url)
+    headers = {
+        "User-Agent": "ai-codebase-assistant"
+    }
 
-    if response.status_code != 200:
+    try:
+        response = requests.get(api_url, headers=headers, timeout=10)
+
+        if response.status_code != 200:
+            return []
+
+        files = []
+
+        for item in response.json():
+
+            if item["type"] == "file":
+
+                file_response = requests.get(
+                    item["download_url"],
+                    headers=headers,
+                    timeout=10
+                )
+
+                files.append({
+                    "filename": item["name"],
+                    "content": file_response.text
+                })
+
+        return files
+
+    except Exception as e:
+        print("GitHub fetch error:", e)
         return []
-
-    files = []
-
-    for item in response.json():
-        if item["type"] == "file":
-
-            file_content = requests.get(item["download_url"]).text
-
-            files.append({
-                "filename": item["name"],
-                "content": file_content
-            })
-
-    return files
