@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: repolens-api
+    runtime: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn backend.app:app
