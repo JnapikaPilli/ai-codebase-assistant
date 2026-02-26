@@ -19,7 +19,7 @@ export default function App() {
     setFilesStored([]);
     setAnswer("");
     try {
-      const res = await fetch(" https://repo-lens.onrender.com", {
+      const res = await fetch(" https://repo-lens.onrender.com/repo/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ repo_url: repoUrl }),
@@ -40,7 +40,7 @@ export default function App() {
     setAskError("");
     setAnswer("");
     try {
-      const res = await fetch(" https://repo-lens.onrender.com", {
+      const res = await fetch(" https://repo-lens.onrender.com/repo/question", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ repo_id: repoId, question }),
