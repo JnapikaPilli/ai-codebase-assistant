@@ -7,6 +7,8 @@ from models.file_model import File   # NEW IMPORT
 from models.question_model import Question
 from routes.repo_routes import repo_bp
 
+import os
+
 app = Flask(__name__)
 CORS(app)
 
@@ -23,5 +25,7 @@ def home():
     return {"message": "AI Codebase Assistant API running"}
 
 
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
