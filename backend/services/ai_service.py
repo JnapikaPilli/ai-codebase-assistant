@@ -1,24 +1,61 @@
+from groq import Groq
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+
+def select_relevant_files(question, files, limit=5):
+    """
+    Simple relevance search:
+    pick files that contain keywords from the question
+    """
+
+    keywords = question.lower().split()
+
+    scored = []
+
+    for file in files:
+        content = file.content.lower()
+
+        score = sum(keyword in content for keyword in keywords)
+
+        scored.append((score, file))
+
+    scored.sort(reverse=True, key=lambda x: x[0])
+
+    return [f for _, f in scored[:limit]]
+
+
 def generate_answer(question, files):
-    """
-    Generate an answer using repository files as context.
-    For now we simulate AI reasoning.
-    """
+
+    relevant_files = select_relevant_files(question, files)
 
     context = ""
 
-    for file in files[:5]:  # limit to first 5 files to avoid huge prompts
+    for file in relevant_files:
         context += f"\nFile: {file.filename}\n"
-        context += file.content[:1000]  # limit content size
+        context += file.content[:800]
 
-    answer = f"""
-Question: {question}
+    prompt = f"""
+You are an AI assistant that explains GitHub repositories.
 
-Based on the repository files, here is a possible explanation:
+Repository context:
+{context}
 
-The repository contains files such as {', '.join([f.filename for f in files[:3]])}.
-These files suggest the repository implements functionality related to the project.
+User question:
+{question}
 
-(Placeholder AI explanation — real AI integration can be added later.)
+Explain clearly what the repository does and how the code works.
 """
 
-    return answer
+    response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    return response.choices[0].message.content
