@@ -82,6 +82,16 @@ Environment variables are used for API keys.
 Observability
 SQLAlchemy query logs and API responses make debugging easy.
 
+Recursive repository indexing is used so code inside nested folders can be analyzed.
+
+A file indexing limit (50 files) prevents very large repositories from overwhelming the AI model.
+
+A keyword-based relevance filter selects the most useful files before sending them to the AI.
+
+Prompt engineering with system instructions improves explanation quality.
+
+Error handling and logging were added for reliability.
+
 ---
 
 ## Running the Project
@@ -99,6 +109,25 @@ npm start
 
 ---
 
+## Running Locally
+
+The frontend connects to the deployed backend API.
+
+Start the frontend:
+
+cd frontend
+npm install
+npm start
+
+## Limitations
+
+Very large repositories may not be fully indexed due to the file limit.
+
+Private repositories are not supported without GitHub authentication.
+
+Relevance selection currently uses keyword matching rather than semantic embeddings.
+
+
 ## Future Improvements
 
 * Semantic search over code using embeddings
@@ -106,3 +135,14 @@ npm start
 * File-level summarization
 * Streaming AI responses
 * Deployment using Docker
+
+## Live Demo
+
+Frontend:
+https://ai-codebase-assistant-uxak.vercel.app/
+
+Backend API:
+https://repo-lens.onrender.com
+Architecture Overview
+.
+

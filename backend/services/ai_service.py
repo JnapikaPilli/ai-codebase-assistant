@@ -31,31 +31,43 @@ def select_relevant_files(question, files, limit=5):
 
 def generate_answer(question, files):
 
-    relevant_files = select_relevant_files(question, files)
+    try:
+        relevant_files = select_relevant_files(question, files)
 
-    context = ""
+        context = ""
 
-    for file in relevant_files:
-        context += f"\nFile: {file.filename}\n"
-        context += file.content[:800]
+        for file in relevant_files:
+            context += f"\nFile: {file.filename}\n"
+            context += file.content[:800]
 
-    prompt = f"""
-You are an AI assistant that explains GitHub repositories.
+        prompt = f"""
+You are analyzing a GitHub repository.
 
-Repository context:
+Repository Files:
 {context}
 
-User question:
+User Question:
 {question}
 
-Explain clearly what the repository does and how the code works.
+Explain clearly what the repository does, its structure, and how the main parts work.
 """
 
-    response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
-    )
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a senior software engineer helping explain GitHub repositories."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        )
 
-    return response.choices[0].message.content
+        return response.choices[0].message.content
+
+    except Exception as e:
+        print("AI generation error:", e)
+        return "Error generating answer from AI."
